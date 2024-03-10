@@ -1,0 +1,124 @@
+
+SQL Assignment 4
+
+1 Explain different types of views. Demonstrate with suitable examples.
+
+System Defined Views,user dfefined views
+CREATE VIEW DetailsView AS    \ 
+SELECT NAME, ADDRESS           \
+FROM StudentDetails              \   single table
+WHERE S_ID < 5;                   \
+
+CREATE VIEW MarksView AS                                                   |
+SELECT StudentDetails.NAME, StudentDetails.ADDRESS, StudentMarks.MARKS     |
+FROM StudentDetails, StudentMarks                                          |   multiple tabel
+WHERE StudentDetails.NAME = StudentMarks.NAME;                             |
+
+
+What is the difference between function and stored procedure? Write syntax for creating functions and stored procedures.
+Function:
+Cannot handle transactions within a function.
+Cannot call a stored procedure from a function.
+
+Stored Procedure:
+Supports transactions within the procedure.
+Can call functions from within a stored procedure.
+
+
+
+1.       CREATE FUNCTION function_name
+( 
+    -- Input parameters
+    @param1 datatype,
+    @param2 datatype
+)
+RETURNS return_datatype
+AS
+BEGIN
+    -- Function logic here
+    RETURN value;
+END;
+
+
+
+
+What is an index in SQL? What are the different types of indexes in SQL? 
+Primary Index,clusterd index,secondary index,dense index,sparse index,specialize indexs(bitmap,reverse,hash,filtered,function-base,spatial index)
+
+
+
+
+CREATE INDEX index_name ON table_name (column_name);
+
+
+
+Showcase an example of exception handling in SQL stored procedure.
+
+CREATE PROCEDURE usp_ExceptionHandlingExample
+AS
+BEGIN
+    BEGIN TRY
+        -- Code that may cause an error
+        SELECT 1/0; -- This will generate a divide-by-zero error
+    END TRY
+    BEGIN CATCH
+        -- Code to handle the error
+        SELECT 
+            ERROR_NUMBER() AS ErrorNumber,
+            ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH;
+END;
+
+
+Create a SQL function to split strings into rows on a given character? 
+Input String: Stephen;peter;berry;Olivier;caroline;
+Stephen
+Peter
+Berry
+Oliver
+Caroline
+
+
+CREATE FUNCTION dbo.SplitStringIntoRows (@inputString NVARCHAR(MAX), @delimiter CHAR(1))
+RETURNS @outputTable TABLE (Value NVARCHAR(MAX))
+AS
+BEGIN
+    DECLARE @startIndex INT
+    DECLARE @endIndex INT
+    DECLARE @substring NVARCHAR(MAX)
+
+    SET @startIndex = 1
+    SET @endIndex = CHARINDEX(@delimiter, @inputString)
+
+    WHILE @endIndex > 0
+    BEGIN
+        SET @substring = SUBSTRING(@inputString, @startIndex, @endIndex - @startIndex)
+        INSERT INTO @outputTable (Value) VALUES (@substring)
+        SET @startIndex = @endIndex + 1
+        SET @endIndex = CHARINDEX(@delimiter, @inputString, @startIndex)
+    END
+
+    IF @startIndex <= LEN(@inputString)
+    BEGIN
+        SET @substring = SUBSTRING(@inputString, @startIndex, LEN(@inputString) - @startIndex + 1)
+        INSERT INTO @outputTable (Value) VALUES (@substring)
+    END
+
+    RETURN
+END
+
+DECLARE @inputString NVARCHAR(MAX) = 'Stephen;peter;berry;Olivier;caroline;'
+DECLARE @delimiter CHAR(1) = ';'
+
+SELECT Value
+FROM dbo.SplitStringIntoRows(@inputString, @delimiter)
+
+
+
+
+
+
+
+
+What is a temporary and a variable table? Write suitable syntax to create temporary tables and variable tables.
+
